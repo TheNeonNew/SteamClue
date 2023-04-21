@@ -1,0 +1,11 @@
+C:\Users\SkarnovichVM\source\repos\SteamClue\obj\Debug\SteamClue.csproj.AssemblyReference.cache
+C:\Users\SkarnovichVM\source\repos\SteamClue\obj\Debug\SteamClue_.Form1.resources
+C:\Users\SkarnovichVM\source\repos\SteamClue\obj\Debug\SteamClue.Properties.Resources.resources
+C:\Users\SkarnovichVM\source\repos\SteamClue\obj\Debug\SteamClue.csproj.GenerateResource.cache
+C:\Users\SkarnovichVM\source\repos\SteamClue\obj\Debug\SteamClue.csproj.CoreCompileInputs.cache
+C:\Users\SkarnovichVM\source\repos\SteamClue\bin\Debug\SteamClue.exe.config
+C:\Users\SkarnovichVM\source\repos\SteamClue\bin\Debug\SteamClue.exe
+C:\Users\SkarnovichVM\source\repos\SteamClue\bin\Debug\SteamClue.pdb
+C:\Users\SkarnovichVM\source\repos\SteamClue\obj\Debug\SteamClue.exe
+C:\Users\SkarnovichVM\source\repos\SteamClue\obj\Debug\SteamClue.pdb
+C:\Users\SkarnovichVM\source\repos\SteamClue\obj\Debug\SteamClue_.Form2.resources
