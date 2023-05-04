@@ -27,14 +27,20 @@ namespace SteamClue_
             InitializeComponent();
             gr = this.CreateGraphics();
 
-            Point p_s = new Point(151, 400);
-            Point e_p = new Point(376, 175);
+            Point point_creator(int x, int y) {
+                Point p = new Point(x, y);
+                return p;
+            }
+            
             Size sz = new Size(default_size - 2, default_size - 2);
             int[] b = new int[4];
 
-            Player Pl = new Player(p_s, sz, this, b);
-            EPoint Ep1 = new EPoint(e_p, sz);
+            Player Pl = new Player(point_creator(151, 400), sz, this, b);
+            EPoint Ep1 = new EPoint(point_creator(376, 175), sz);
+            Stone[] stones = { new Stone(point_creator(151, 325), sz), new Stone(point_creator(301, 400), sz) };
+
             Pl.ep = Ep1;
+            Pl.obstacles = stones;
 
             this.Click += (s, e) =>
             {
@@ -52,8 +58,9 @@ namespace SteamClue_
             lim_box.Location = new Point(400, 25);
             lim_box.Text = Convert.ToString(Pl.lim);
             Pl.Ehandler += () => lim_box.Text = Convert.ToString(Pl.lim);
-            Ep1.Ehandler += () => Ep1.finish_func();
-            
+            Ep1.WinEvent += () => Ep1.show_winscr();
+            Ep1.FailEvent += () => Ep1.show_failscr();
+
             this.Controls.Add(lim_box);
             
 
@@ -89,6 +96,7 @@ namespace Classes
         public PictureBox plbox;
         public string[] inventory;
         public int[] bounds;
+        public Stone[] obstacles;
         public int lim, step;
         public EPoint ep;
 
@@ -97,6 +105,7 @@ namespace Classes
 
         public Form used_form;
         
+
         public Player(Point spawn, Size size, Form form, int[] bds)
         {
             plbox = new PictureBox
@@ -106,14 +115,19 @@ namespace Classes
                 SizeMode = PictureBoxSizeMode.StretchImage,
                 Location = spawn
             };
-            lim = 10;
+            lim = 6;
             step = size.Width + 2;
             bounds = bds;
             used_form = form;
             form.KeyDown += Move;
             
-            
         }
+
+        //public void Call_Ehandler()
+        //{
+           // Ehandler?.Invoke();
+        //}
+
         public void Move(object sender, KeyEventArgs e)
         {
             Point l = plbox.Location;
@@ -136,18 +150,20 @@ namespace Classes
                     plbox.Location = pr;
                     return;
             }
+            plbox.Location = l;
+            Func<Stone, bool> pred = (st) => st.CheckCollision(this);
             bool possible_move = ( (bounds[0] <= l.X && bounds[2] >= l.X) &&
                                    (bounds[1] <= l.Y && bounds[3] >= l.Y) && lim > 0 )
-                                   || ep.CheckCollision(this);
+                                   && !ep.CheckCollision(this) && obstacles.Where(pred).Count() == 0;
             //MessageBox.Show(Convert.ToString(l.Y));
                                  
             if (possible_move)
-            {
-                plbox.Location = l;
+            {             
                 lim--;
                 Ehandler?.Invoke();
                 return;
             }
+            
             plbox.Location = pr;
 
 
@@ -160,10 +176,12 @@ namespace Classes
     public class EPoint
     {
         public PictureBox epbox;
-        public bool lvl_complete;
+        public bool lvl_complete = false;
 
         public delegate void fdg();
-        public event fdg Ehandler;
+        public event fdg WinEvent;
+
+        public event fdg FailEvent;
         
 
     public EPoint(Point spawn, Size size)
@@ -172,37 +190,70 @@ namespace Classes
             epbox = new PictureBox
             {
                 Size = size,
-                ImageLocation = @"C:\Users\пользователь\source\repos\SteamClue\SteamClue\epoint.jpg",
+                ImageLocation = @"\epoint.png",
                 SizeMode = PictureBoxSizeMode.StretchImage,
                 Location = spawn
             };           
         }
         public bool CheckCollision(Player p)
         {
-            if (p.plbox.Location.X == this.epbox.Location.X && p.plbox.Location.Y == this.epbox.Location.Y)
+            if (p.plbox.Location == epbox.Location)
             {
                 lvl_complete = true;
-                Ehandler?.Invoke();
+                WinEvent?.Invoke();
                 return true;
+            }
+            if (p.lim <= 1)
+            {              
+                FailEvent?.Invoke();
             }
             return false;
         }
 
-        public void finish_func()
+        public void show_winscr()
         {
             MessageBox.Show("Level Completed!");
         }
 
+        public void show_failscr()
+        {
+            MessageBox.Show("Level Failed!");
+        }
     };
 
     public class BaseObstacle
     {
+        public PictureBox obsbox;
 
+        public delegate void fdg();
+        public event fdg CollideEvent;
+
+        public BaseObstacle(Point spawn, Size size)
+        {
+            // Constructor Classes.Epoint
+            obsbox = new PictureBox
+            {
+                Size = size,
+                ImageLocation = null,
+                SizeMode = PictureBoxSizeMode.StretchImage,
+                Location = spawn
+            };
+        }
+        public bool CheckCollision(Player p)
+        {
+            if (p.plbox.Location == obsbox.Location) {
+                return true;
+            }
+            return false;
+        }
     };
 
     public class Stone : BaseObstacle
     {
-
+        public Stone(Point spawn, Size size) : base(spawn, size)
+        {
+            obsbox.ImageLocation = @"\stone.png";
+        }
     };
 
 }
