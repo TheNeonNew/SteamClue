@@ -1,0 +1,4 @@
+The goal of the game is to reach the desired point in a limited number of steps
+Moving is carried out on the WASD keys
+Help the mechanic collect all the parts before the portal closes
+Enjoy the game!
