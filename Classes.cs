@@ -1,13 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Drawing;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using System.IO;
 
 namespace Classes
 {
@@ -81,10 +76,9 @@ namespace Classes
             if (possible_move)
             {
                 Spike[] spikes = obstacles.OfType<Spike>().ToArray();
-                foreach (Spike spike in spikes) spike.SwitchSpike();
+                foreach (Spike spike in spikes) if(!spike.is_reseted) spike.SwitchSpike();
                 lim--;
                 Ehandler?.Invoke();
-                //MessageBox.Show(plbox.Location.ToString());
                 return;
             }
 
@@ -157,6 +151,7 @@ namespace Classes
     {
         PictureBox ICollideable.obsbox { get; set; }
         bool ICollideable.EndingScrCallable { get; set; }
+        public bool is_reseted = false;
         public ICollideable IC;
         public delegate void fdg();
         public event fdg CollideEvent;
@@ -174,9 +169,14 @@ namespace Classes
                 Location = spawn
             };
         }
+        public virtual void Reset()
+        {
+            is_reseted = true;
+        }
+
         public virtual bool CheckCollision(Player p)
         {
-            if (p.plbox.Location == IC.obsbox.Location)
+            if (p.plbox.Location == IC.obsbox.Location && !is_reseted)
             {
                 return true;
             }
@@ -214,9 +214,9 @@ namespace Classes
             };
         }
         public override bool CheckCollision(Player p)
-        {
-            if (p.plbox.Location == IC.obsbox.Location)
-            {
+        {         
+            if (p.plbox.Location == IC.obsbox.Location && !is_reseted)
+            {              
                 if (hidden)
                 {
                     SwitchSpike();
@@ -226,6 +226,11 @@ namespace Classes
                 return true;
             }
             return false;
+        }
+        public override void Reset()
+        {
+            base.Reset();
+            IC.obsbox.ImageLocation = @"imgs\spike_hidden.png";
         }
 
         public void SwitchSpike()
@@ -240,27 +245,76 @@ namespace Classes
             }
             hidden = !hidden;
         }
-    };
-
+    }
     public class Gear : BaseObstacle, ICollideable
     {
         bool collected = false;
-        public Gear(Point spawn, Size size) : base(spawn, size)
+        public string type;
+        public Gear(Point spawn, Size size, string tp) : base(spawn, size)
         {
-            IC.obsbox.ImageLocation = @"imgs\gear.png";           
+            IC.obsbox.ImageLocation = @"imgs\" + tp + "_gear.png";
+            type = tp;
         }
-        
+
 
         public override bool CheckCollision(Player p)
         {
             if (p.plbox.Location == IC.obsbox.Location && !collected)
             {
-                p.inventory.Append(this);
+                Gear[] grs = { this };
+                p.inventory = p.inventory.Concat(grs).ToArray();
                 collected = true;
                 IC.obsbox.Visible = false;
                 return false;
             }
             return false;
+        }
+    }
+
+    public class GearPanel : BaseObstacle, ICollideable
+    {
+        public bool activated = false;
+        public string type;
+        public BaseObstacle[] open;
+
+        public GearPanel(Point spawn, Size size, BaseObstacle[] to_open, string tp) : base(spawn, size)
+        {
+            open = to_open;
+            IC.obsbox.ImageLocation = @"imgs\" + tp + "_panel.png";
+            type = tp;
+        }
+
+        public void Open()
+        {
+            if (activated)
+            {
+                for (int i = 0; i < open.Length; i++)
+                {
+                    if(open[i].GetType() == typeof(Wall)) open[i].IC.obsbox.Visible = false;
+                    open[i].Reset();
+                }
+                IC.obsbox.ImageLocation = IC.obsbox.ImageLocation.Substring(0, IC.obsbox.ImageLocation.Length - 4) + "_wgear.png";
+            }
+        }
+
+        public override bool CheckCollision(Player p)
+        {
+            if (p.plbox.Location == IC.obsbox.Location)
+            {
+                if (!p.inventory.Where(g => 
+                { if (g == null) return false; return g.type == this.type; }).Any()) return true;
+                activated = true;
+                Open();
+                return true;
+            }
+            return false;
+        }
+    }
+    public class Boiler : Gear
+    {
+        public Boiler(Point spawn, Size size, string t="boiler") : base(spawn, size, t)
+        {
+            IC.obsbox.ImageLocation = @"imgs\boiler.png";
         }
     }
 

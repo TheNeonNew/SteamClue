@@ -28,6 +28,7 @@ namespace SteamClue_
         {
             InitializeComponent();
             gr = this.CreateGraphics();
+            this.ShowIcon = false;
 
             Point point_creator(int x, int y) {
                 Point p = new Point(x, y);

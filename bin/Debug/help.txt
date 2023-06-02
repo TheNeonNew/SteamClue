@@ -2,3 +2,8 @@ The goal of the game is to reach the desired point in a limited number of steps
 Moving is carried out on the WASD keys
 Help the mechanic collect all the parts before the portal closes
 Enjoy the game!
+---
+Цель игры заключается в том, чтобы достичь портала за ограниченное количество шагов
+Клавиши WASD отвечают за движение главного персонажа - механика
+Помогите ему собрать все детали до того как портал закроется
+Хорошей игры!

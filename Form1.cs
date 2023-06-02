@@ -16,6 +16,7 @@ namespace SteamClue_
         public Form1()
         {
             InitializeComponent();
+            this.ShowIcon = false;
             foreach (Control item in this.Controls)
             {
                 if (item is Button)
@@ -38,7 +39,7 @@ namespace SteamClue_
         public void show_help()
         {
             Form help_form = new Form();
-            help_form.Size = new Size(600, 300);
+            help_form.Size = new Size(625, 350);
             Label help_text = new Label();
             help_text.Font = new Font("Courier New", 14);
             help_text.Size = new Size(help_form.Width - 2, help_form.Height - 2);

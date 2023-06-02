@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -23,6 +23,7 @@ namespace SteamClue_
         {
             InitializeComponent();
             gr = this.CreateGraphics();
+            this.ShowIcon = false;
             main_f = f;
 
             Point point_creator(int x, int y)
@@ -33,12 +34,23 @@ namespace SteamClue_
 
             Size sz = new Size(default_size - 2, default_size - 2);
             int[] b = new int[4];
-            Player Pl = new Player(point_creator(401, 386), sz, this, b);
-
-            EPoint Ep = new EPoint(point_creator(151, 176), sz);
-            ICollideable[] obstes = { };
+            Player Pl = new Player(point_creator(551, 386), sz, this, b);
+            Wall doorWall = new Wall(point_creator(551, 161), sz);
+            Wall[] doorWallarr = { doorWall };
+            Wall[] fakeWarr = { new Wall(point_creator(176, 461), sz), new Wall(point_creator(251, 86), sz) };
+            EPoint Ep = new EPoint(point_creator(551, 86), sz);
+            ICollideable[] obstes = { Ep, new Spike(point_creator(476, 86), sz, Ep), doorWall, fakeWarr[0], fakeWarr[1],
+                new GearPanel(point_creator(476, 161), sz, doorWallarr, "iron"), 
+                new Gear(point_creator(326, 311), sz, "bronze"), new Spike(point_creator(401, 311), sz, Ep), 
+                new Spike(point_creator(326, 386), sz, Ep, "imgs\\spike_hidden.png", true), 
+                new Spike(point_creator(326, 236), sz, Ep, "imgs\\spike_hidden.png", true),
+                new Spike(point_creator(251, 311), sz, Ep), new Spike(point_creator(251, 161), sz, Ep),
+                new Spike(point_creator(251, 461), sz, Ep), new Spike(point_creator(251, 236), sz, Ep, "imgs\\spike_hidden.png", true),
+                new Gear(point_creator(101, 161), sz, "iron"), new Wall(point_creator(101, 311), sz),
+                new GearPanel(point_creator(101, 461), sz, fakeWarr, "bronze"), new Spike(point_creator(476, 461), sz, Ep)
+            };
             Pl.obstacles = obstes;
-            Pl.lim = 50;
+            Pl.lim = 33;
             Pl.ep = Ep;
             Label lim_box = new Label
             {
@@ -95,11 +107,82 @@ namespace SteamClue_
 
         public void show_winscr()
         {
-            MessageBox.Show("1");
+            Form winscr = new Form();
+            winscr.Size = new Size(600, 300);
+            winscr.Text = "Win Screen";
+            Label winlabel = new Label
+            {
+                Location = new Point(200, 50),
+                Text = "Level Completed!",
+                Size = new Size(250, 30),
+                Font = new Font("Ariel", 18)
+            };
+            Button restart_btn = new Button
+            {
+                Location = new Point(100, 100),
+                Size = new Size(100, 100),
+                BackgroundImage = Image.FromFile(@"imgs\restart_btn.png"),
+                BackgroundImageLayout = ImageLayout.Stretch
+
+            };
+            Button next_btn = new Button
+            {
+                Location = new Point(400, 100),
+                Size = new Size(100, 100),
+                BackgroundImage = Image.FromFile(@"imgs\next_lvl_btn.png"),
+                BackgroundImageLayout = ImageLayout.Stretch
+            };
+            Control[] ctrls = { restart_btn, next_btn, winlabel };
+            winscr.Controls.AddRange(ctrls);
+            restart_btn.Click += (s, e) =>
+            {
+                Form4 resLvlForm = new Form4(this.main_f);
+                resLvlForm.Show();
+                winscr.Close();
+                this.Close();
+            };
+
+            next_btn.Click += (s, e) =>
+            {
+                Form5 nextLvlForm = new Form5(this.main_f);
+                nextLvlForm.Show();
+                winscr.Close();
+                this.Close();
+
+            };
+
+            winscr.Show();
         }
         public void show_failscr()
         {
-            MessageBox.Show("0");
+            Form failscr = new Form();
+            failscr.Size = new Size(600, 300);
+            failscr.Text = "Win Screen";
+            Label faillabel = new Label
+            {
+                Location = new Point(200, 50),
+                Text = "Level Failed!",
+                Size = new Size(250, 30),
+                Font = new Font("Ariel", 18)
+            };
+            Button restart_btn = new Button
+            {
+                Location = new Point(250, 100),
+                Size = new Size(100, 100),
+                BackgroundImage = Image.FromFile(@"imgs\restart_btn.png"),
+                BackgroundImageLayout = ImageLayout.Stretch
+
+            };
+            Control[] ctrls = { restart_btn, faillabel };
+            failscr.Controls.AddRange(ctrls);
+            restart_btn.Click += (s, e) =>
+            {
+                Form4 resLvlForm = new Form4(this.main_f);
+                resLvlForm.Show();
+                failscr.Close();
+                this.Close();
+            };
+            failscr.Show();
         }
         private int[] paint_field(int n, int sz = St_Size)
         {
@@ -123,3 +206,4 @@ namespace SteamClue_
         }
     }
 }
+
